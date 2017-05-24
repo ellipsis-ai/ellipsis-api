@@ -4,7 +4,8 @@ const errorMessages = {
   ELLIPSIS_OBJECT_MISSING: "You need to pass an `ellipsis` object through from an Ellipsis action",
   MESSAGE_MISSING: "You need to pass a `message` argument",
   ACTION_NAME_MISSING: "You need to pass an `actionName` argument",
-  MESSAGE_AND_ACTION_NAME_MISSING: "You need to pass either an `actionName` or a `message` argument",
+  TRIGGER_AND_ACTION_NAME_MISSING: "You need to pass either an `actionName` or a `trigger` argument",
+  BOTH_TRIGGER_AND_ACTION_NAME: "You can't pass both an `actionName` and a `trigger` argument. Just pass one",
   SCHEDULE_ACTION_MISSING: "You need to pass an `action` argument for the thing you want to schedule",
   UNSCHEDULE_ACTION_MISSING: "You need to pass an `action` argument for the thing you want to unschedule",
   RECURRENCE_MISSING: "You need to pass a `recurrence` argument to specify when you want to schedule the action to recur, e.g. \"every weekday at 9am\""
@@ -71,14 +72,20 @@ class ActionsApi {
     return `${this.ellipsis.apiBaseUrl}/api/${path}`;
   }
 
-  run(actionName, options) {
+  run(options) {
     return new Promise((resolve, reject) => {
       const mergedOptions = Object.assign({}, options, {
         success: resolve,
         error: reject
       });
+      if (!mergedOptions.actionName && !mergedOptions.trigger) {
+        this.handleError(mergedOptions, errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
+      } else if (mergedOptions.actionName && mergedOptions.trigger) {
+        this.handleError(mergedOptions, errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
+      }
       const formData = Object.assign({
-        actionName: actionName,
+        actionName: mergedOptions.actionName,
+        trigger: mergedOptions.trigger,
         responseContext: this.responseContextFor(mergedOptions),
         channel: this.channelFor(mergedOptions),
         token: this.token()
@@ -87,28 +94,6 @@ class ActionsApi {
         url: this.urlFor("run_action"),
         form: formData
       }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
-    });
-  }
-
-  postMessage(message, options) {
-    return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
-      if (!message) {
-        this.handleError(mergedOptions, errorMessages.MESSAGE_MISSING);
-      } else {
-        request.post({
-          url: this.urlFor("post_message"),
-          form: {
-            message: message,
-            responseContext: this.responseContextFor(mergedOptions),
-            channel: this.channelFor(mergedOptions),
-            token: this.token()
-          }}, (error, response, body) => this.handleResponse(mergedOptions, error, response, body)
-        );
-      }
     });
   }
 
@@ -185,5 +170,6 @@ class ActionsApi {
 }
 
 module.exports = {
-  ActionsApi: ActionsApi
+  ActionsApi: ActionsApi,
+  ErrorMessages: errorMessages
 };
