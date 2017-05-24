@@ -17,7 +17,8 @@ const defaultExpectedForm = {
   responseContext: ellipsis.userInfo.messageInfo.medium,
   channel: ellipsis.userInfo.messageInfo.channel,
   token: ellipsis.token
-}
+};
+
 const api = new EllipsisApi.ActionsApi(ellipsis);
 const errorMessages = EllipsisApi.ErrorMessages;
 
@@ -37,6 +38,7 @@ describe("ActionsApi", () => {
           "arguments[0].value": args[0].value
         });
         expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(api.urlFor("run_action"))
       });
 
     });
@@ -51,6 +53,7 @@ describe("ActionsApi", () => {
           trigger: trigger
         });
         expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(api.urlFor("run_action"))
       });
 
     });
@@ -68,6 +71,144 @@ describe("ActionsApi", () => {
 
       expect.hasAssertions();
       api.run({ actionName: "foo", trigger: "bar" }).catch(err => {
+        expect(err).toEqual(errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
+      });
+
+    });
+
+  });
+
+  describe("say", () => {
+
+    it("sends an appropriate api request", () => {
+
+      expect.hasAssertions();
+      const message = "yo";
+      return api.say({ message: message }).then(data => {
+        const form = data.body.form;
+        const expectedForm = Object.assign({}, defaultExpectedForm, {
+          message: message
+        });
+        expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(api.urlFor("say"))
+      });
+
+    });
+
+    it("complains when no message", () => {
+
+      expect.hasAssertions();
+      return api.say({ }).catch(err => {
+        expect(err).toEqual(errorMessages.MESSAGE_MISSING);
+      });
+
+    });
+
+  });
+
+  describe("schedule", () => {
+
+    const defaultOptions = {
+      recurrence: "every day at noon",
+      useDM: true
+    };
+
+    it("sends an appropriate api request", () => {
+
+      expect.hasAssertions();
+      const actionName = "some action";
+      const args = [ {name: "param", value: "v" }];
+      const options = Object.assign({}, defaultOptions, {
+        actionName: actionName,
+        args: args
+      });
+      return api.schedule(options).then(data => {
+        const form = data.body.form;
+        const expectedForm = Object.assign({}, defaultExpectedForm, defaultOptions, {
+          actionName: options.actionName,
+          "arguments[0].name": args[0].name,
+          "arguments[0].value": args[0].value
+        });
+        expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(api.urlFor("schedule_action"))
+      });
+
+    });
+
+    it("complains when no trigger or action name", () => {
+
+      expect.hasAssertions();
+      return api.schedule(defaultOptions).catch(err => {
+        expect(err).toEqual(errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
+      });
+
+    });
+
+    it("complains when both trigger and action name", () => {
+
+      expect.hasAssertions();
+      const options = Object.assign({}, defaultOptions, {
+        actionName: "foo",
+        trigger: "bar"
+      });
+      return api.schedule(options).catch(err => {
+        expect(err).toEqual(errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
+      });
+
+    });
+
+    it("complains when no recurrence", () => {
+
+      expect.hasAssertions();
+      const options = Object.assign({}, defaultOptions, {
+        actionName: "foo"
+      });
+      delete options.recurrence;
+      return api.schedule(options).catch(err => {
+        expect(err).toEqual(errorMessages.RECURRENCE_MISSING);
+      });
+
+    });
+
+  });
+
+  describe("unschedule", () => {
+
+    it("sends an appropriate api request", () => {
+
+      expect.hasAssertions();
+      const actionName = "some action";
+      const options = Object.assign({}, {
+        actionName: actionName
+      });
+      return api.unschedule(options).then(data => {
+        const form = data.body.form;
+        const expectedForm = Object.assign({}, defaultExpectedForm, {
+          actionName: options.actionName
+        });
+        expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(api.urlFor("unschedule_action"))
+      });
+
+    });
+
+    it("complains when no trigger or action name", () => {
+
+      expect.hasAssertions();
+      return api.unschedule({}).catch(err => {
+        expect(err).toEqual(errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
+      });
+
+    });
+
+    it("complains when both trigger and action name", () => {
+
+      expect.hasAssertions();
+      const options = Object.assign({}, {
+        actionName: "foo",
+        trigger: "bar"
+      });
+      return api.unschedule(options).catch(err => {
         expect(err).toEqual(errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
       });
 

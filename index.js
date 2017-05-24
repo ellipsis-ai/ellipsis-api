@@ -72,17 +72,21 @@ class ActionsApi {
     return `${this.ellipsis.apiBaseUrl}/api/${path}`;
   }
 
+  checkActionOptionsIn(options) {
+    if (!options.actionName && !options.trigger) {
+      this.handleError(options, errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
+    } else if (options.actionName && options.trigger) {
+      this.handleError(options, errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
+    }
+  }
+
   run(options) {
     return new Promise((resolve, reject) => {
       const mergedOptions = Object.assign({}, options, {
         success: resolve,
         error: reject
       });
-      if (!mergedOptions.actionName && !mergedOptions.trigger) {
-        this.handleError(mergedOptions, errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
-      } else if (mergedOptions.actionName && mergedOptions.trigger) {
-        this.handleError(mergedOptions, errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
-      }
+      this.checkActionOptionsIn(mergedOptions);
       const formData = Object.assign({
         actionName: mergedOptions.actionName,
         trigger: mergedOptions.trigger,
@@ -97,19 +101,19 @@ class ActionsApi {
     });
   }
 
-  say(message, options) {
+  say(options) {
     return new Promise((resolve, reject) => {
       const mergedOptions = Object.assign({}, options, {
         success: resolve,
         error: reject
       });
-      if (!message) {
+      if (!mergedOptions.message) {
         this.handleError(mergedOptions, errorMessages.MESSAGE_MISSING);
       } else {
         request.post({
           url: this.urlFor("say"),
           form: {
-            message: message,
+            message: mergedOptions.message,
             responseContext: this.responseContextFor(mergedOptions),
             channel: this.channelFor(mergedOptions),
             token: this.token()
@@ -119,51 +123,54 @@ class ActionsApi {
     });
   }
 
-  schedule(actionName, options) {
+  checkSchedulingOptionsIn(options) {
+    this.checkActionOptionsIn(options);
+    if (!options.recurrence) {
+      this.handleError(options, errorMessages.RECURRENCE_MISSING);
+    }
+  }
+
+  schedule(options) {
     return new Promise((resolve, reject) => {
       const mergedOptions = Object.assign({}, options, {
         success: resolve,
         error: reject
       });
-      if (!actionName) {
-        this.handleError(args, errorMessages.ACTION_NAME_MISSING);
-      } else {
-        const formData = Object.assign({
-          actionName: actionName,
-          responseContext: this.responseContextFor(mergedOptions),
-          channel: this.channelFor(mergedOptions),
-          recurrence: mergedOptions.recurrence,
-          useDM: mergedOptions.useDM,
-          token: this.token()
-        }, this.argsFormDataFor(mergedOptions.args));
-        request.post({
-          url: this.urlFor("schedule_action"),
-          form: formData
-        }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
-      }
+      this.checkSchedulingOptionsIn(mergedOptions);
+      const formData = Object.assign({
+        actionName: mergedOptions.actionName,
+        trigger: mergedOptions.trigger,
+        responseContext: this.responseContextFor(mergedOptions),
+        channel: this.channelFor(mergedOptions),
+        recurrence: mergedOptions.recurrence,
+        useDM: !!mergedOptions.useDM,
+        token: this.token()
+      }, this.argsFormDataFor(mergedOptions.args));
+      request.post({
+        url: this.urlFor("schedule_action"),
+        form: formData
+      }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
     });
   }
 
-  unschedule(actionName, options) {
+  unschedule(options) {
     return new Promise((resolve, reject) => {
       const mergedOptions = Object.assign({}, options, {
         success: resolve,
         error: reject
       });
-      if (!actionName) {
-        this.handleError(mergedOptions, errorMessages.ACTION_NAME_MISSING);
-      } else {
-        const formData = {
-          actionName: actionName,
-          userId: mergedOptions.userId,
-          channel: this.channelFor(mergedOptions),
-          token: this.token()
-        };
-        request.post({
-          url: this.urlFor("unschedule_action"),
-          form: formData
-        }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
-      }
+      this.checkActionOptionsIn(mergedOptions);
+      const formData = {
+        actionName: mergedOptions.actionName,
+        userId: mergedOptions.userId,
+        channel: this.channelFor(mergedOptions),
+        responseContext: this.responseContextFor(mergedOptions),
+        token: this.token()
+      };
+      request.post({
+        url: this.urlFor("unschedule_action"),
+        form: formData
+      }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
     });
   }
 
