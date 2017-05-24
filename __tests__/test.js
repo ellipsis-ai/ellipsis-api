@@ -13,6 +13,11 @@ const ellipsis = {
   },
   token: "123456acbdef"
 };
+const defaultExpectedForm = {
+  responseContext: ellipsis.userInfo.messageInfo.medium,
+  channel: ellipsis.userInfo.messageInfo.channel,
+  token: ellipsis.token
+}
 const api = new EllipsisApi.ActionsApi(ellipsis);
 
 describe("ActionsApi", () => {
@@ -24,11 +29,12 @@ describe("ActionsApi", () => {
       const args = [ {name: "param", value: "v" }];
       return api.run("foo", { args: args }).then(data => {
         const form = data.body.form;
-        expect(form.actionName).toEqual("foo");
-        expect(form.responseContext).toEqual(ellipsis.userInfo.messageInfo.medium);
-        expect(form.channel).toEqual(ellipsis.userInfo.messageInfo.channel);
-        expect(form["arguments[0].name"]).toEqual(args[0].name);
-        expect(form["arguments[0].value"]).toEqual(args[0].value);
+        const expectedForm = Object.assign({}, defaultExpectedForm, {
+          actionName: "foo",
+          "arguments[0].name": args[0].name,
+          "arguments[0].value": args[0].value
+        });
+        expect(form).toEqual(expectedForm);
       });
 
     });
@@ -39,11 +45,13 @@ describe("ActionsApi", () => {
     it("sends an appropriate api request", () => {
 
       expect.hasAssertions();
-      return api.postMessage("foo bar baz").then(data => {
+      const message = "foo bar baz";
+      return api.postMessage(message).then(data => {
         const form = data.body.form;
-        expect(form.message).toEqual("foo bar baz");
-        expect(form.responseContext).toEqual(ellipsis.userInfo.messageInfo.medium);
-        expect(form.channel).toEqual(ellipsis.userInfo.messageInfo.channel);
+        const expectedForm = Object.assign({}, defaultExpectedForm, {
+          message: message
+        });
+        expect(form).toEqual(expectedForm);
       });
 
     });
