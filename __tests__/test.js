@@ -1,8 +1,10 @@
 "use strict";
 
 jest.unmock('../index');
+jest.unmock('../error-messages');
 jest.mock('request');
 
+const errorMessages = require('../error-messages');
 const EllipsisApi = require('../index');
 const ellipsis = {
   userInfo: {
@@ -19,8 +21,7 @@ const defaultExpectedForm = {
   token: ellipsis.token
 };
 
-const api = new EllipsisApi.ActionsApi(ellipsis);
-const errorMessages = EllipsisApi.ErrorMessages;
+const api = new EllipsisApi(ellipsis);
 
 describe("ActionsApi", () => {
 
