@@ -33,6 +33,10 @@ class Api {
     }
   }
 
+}
+
+class ActionsApi extends Api {
+
   handleResponse(options, error, response, body) {
     if (error) {
       this.handleError(options, error);
@@ -166,4 +170,43 @@ class Api {
 
 }
 
-module.exports = Api;
+class StorageApi extends Api {
+
+  url() {
+    return `${this.ellipsis.apiBaseUrl}/api/graphql`;
+  }
+
+  checkOptionsIn(options) {
+    if (!options.query) {
+      this.handleError(options, errorMessages.GRAPHQL_QUERY_MISSING);
+    }
+  }
+
+  query(options) {
+    return new Promise((resolve, reject) => {
+      this.checkOptionsIn(options);
+      const formData = {
+        query: options.query,
+        operationName: options.operationName,
+        variables: options.variables,
+        token: this.token()
+      };
+      request.post({
+        url: this.url(),
+        form: formData
+      }, (error, response, body) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(response, body);
+        }
+      });
+    });
+  }
+
+}
+
+ActionsApi.Actions = ActionsApi;
+ActionsApi.Storage = StorageApi;
+
+module.exports = ActionsApi;
