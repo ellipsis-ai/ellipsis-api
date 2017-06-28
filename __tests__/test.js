@@ -21,8 +21,9 @@ const defaultExpectedForm = {
   token: ellipsis.token
 };
 
-const actionsApi = new EllipsisApi.Actions(ellipsis);
-const storageApi = new EllipsisApi.Storage(ellipsis);
+const api = new EllipsisApi(ellipsis);
+const actionsApi = api.actions;
+const storageApi = api.storage;
 
 describe("ActionsApi", () => {
 

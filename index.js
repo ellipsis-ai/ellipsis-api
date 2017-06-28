@@ -1,7 +1,7 @@
 const request = require('request');
 const errorMessages = require('./error-messages');
 
-class Api {
+class AbstractApi {
 
   constructor(ellipsis) {
     if (typeof ellipsis !== "object") {
@@ -35,7 +35,17 @@ class Api {
 
 }
 
-class ActionsApi extends Api {
+class Api extends AbstractApi {
+
+  constructor(ellipsis) {
+    super(ellipsis);
+    this.actions = new ActionsApi(ellipsis);
+    this.storage = new StorageApi(ellipsis);
+  }
+
+}
+
+class ActionsApi extends AbstractApi {
 
   handleResponse(options, error, response, body) {
     if (error) {
@@ -170,7 +180,7 @@ class ActionsApi extends Api {
 
 }
 
-class StorageApi extends Api {
+class StorageApi extends AbstractApi {
 
   url() {
     return `${this.ellipsis.apiBaseUrl}/api/graphql`;
@@ -206,7 +216,4 @@ class StorageApi extends Api {
 
 }
 
-ActionsApi.Actions = ActionsApi;
-ActionsApi.Storage = StorageApi;
-
-module.exports = ActionsApi;
+module.exports = Api;
