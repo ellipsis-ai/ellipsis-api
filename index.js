@@ -192,13 +192,23 @@ class StorageApi extends AbstractApi {
     }
   }
 
+  variablesStringFor(v) {
+    if (typeof v === 'object') {
+      return JSON.stringify(v);
+    } else if (v && typeof v.toString === 'function') {
+      return v.toString();
+    } else {
+      return v;
+    }
+  }
+
   query(options) {
     return new Promise((resolve, reject) => {
       this.checkOptionsIn(options);
       const formData = {
         query: options.query,
         operationName: options.operationName,
-        variables: options.variables,
+        variables: this.variablesStringFor(options.variables),
         token: this.token()
       };
       request.post({

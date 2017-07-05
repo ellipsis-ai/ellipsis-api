@@ -242,6 +242,44 @@ describe("StorageApi", () => {
 
     });
 
+    it("handles variables passed in a JS object", () => {
+
+      expect.hasAssertions();
+      const query = "{ foo { bar } }";
+      const variables = { key1: "something", key2: { key3: "something else" } };
+      return storageApi.query({ query: query, variables: variables }).then(data => {
+        const form = data.body.form;
+        const expectedForm = {
+          query: query,
+          operationName: undefined,
+          variables: JSON.stringify(variables),
+          token: ellipsis.token
+        };
+        expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(storageApi.url())
+      });
+
+    });
+
+    it("handles variables passed in a string", () => {
+
+      expect.hasAssertions();
+      const query = "{ foo { bar } }";
+      const variables = '{ "key1": "something", "key2": { "key3": "something else" } }';
+      return storageApi.query({ query: query, variables: variables }).then(data => {
+        const form = data.body.form;
+        const expectedForm = {
+          query: query,
+          operationName: undefined,
+          variables: variables,
+          token: ellipsis.token
+        };
+        expect(form).toEqual(expectedForm);
+        expect(data.url).toEqual(storageApi.url())
+      });
+
+    });
+
     it("complains if no query", () => {
 
       expect.hasAssertions();
