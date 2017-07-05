@@ -213,7 +213,8 @@ class StorageApi extends AbstractApi {
       };
       request.post({
         url: this.url(),
-        form: formData
+        form: formData,
+        json: true
       }, (error, response, body) => {
         if (error) {
           reject(error);
