@@ -35,16 +35,6 @@ class AbstractApi {
 
 }
 
-class Api extends AbstractApi {
-
-  constructor(ellipsis) {
-    super(ellipsis);
-    this.actions = new ActionsApi(ellipsis);
-    this.storage = new StorageApi(ellipsis);
-  }
-
-}
-
 class ActionsApi extends AbstractApi {
 
   handleResponse(options, error, response, body) {
@@ -225,6 +215,16 @@ class StorageApi extends AbstractApi {
         }
       });
     });
+  }
+
+}
+
+class Api extends AbstractApi {
+
+  constructor(ellipsis) {
+    super(ellipsis);
+    this.actions = new ActionsApi(ellipsis);
+    this.storage = new StorageApi(ellipsis);
   }
 
 }
