@@ -39,7 +39,7 @@ describe("ActionsApi", () => {
           "arguments[0].value": args[0].value
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(api.urlFor("run_action"))
+        expect(data.url).toEqual(api.urlFor("run_action"));
       });
 
     });
@@ -54,7 +54,7 @@ describe("ActionsApi", () => {
           trigger: trigger
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(api.urlFor("run_action"))
+        expect(data.url).toEqual(api.urlFor("run_action"));
       });
 
     });
@@ -91,7 +91,7 @@ describe("ActionsApi", () => {
           message: message
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(api.urlFor("say"))
+        expect(data.url).toEqual(api.urlFor("say"));
       });
 
     });
@@ -131,7 +131,7 @@ describe("ActionsApi", () => {
           "arguments[0].value": args[0].value
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(api.urlFor("schedule_action"))
+        expect(data.url).toEqual(api.urlFor("schedule_action"));
       });
 
     });
@@ -188,7 +188,7 @@ describe("ActionsApi", () => {
           actionName: options.actionName
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(api.urlFor("unschedule_action"))
+        expect(data.url).toEqual(api.urlFor("unschedule_action"));
       });
 
     });
