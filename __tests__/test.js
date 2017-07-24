@@ -1,10 +1,13 @@
 "use strict";
 
-jest.unmock('../index');
-jest.unmock('../error-messages');
-jest.mock('request');
+jest.mock('request', () => {
+  return {
+    post: jest.fn((params, callback) => callback(null, { statusCode: 200 }, { form: params.form }))
+  };
+});
 
 const errorMessages = require('../error-messages');
+const request = require('request');
 const EllipsisApi = require('../index');
 const ellipsis = {
   userInfo: {
@@ -33,15 +36,15 @@ describe("ActionsApi", () => {
       expect.hasAssertions();
       const args = [ {name: "param", value: "v" }];
       const actionName = "foo";
-      return actionsApi.run({ actionName: actionName, args: args }).then(data => {
-        const form = data.body.form;
+      return actionsApi.run({ actionName: actionName, args: args }).then(body => {
+        const form = body.form;
         const expectedForm = Object.assign({}, defaultExpectedForm, {
           actionName: actionName,
           "arguments[0].name": args[0].name,
           "arguments[0].value": args[0].value
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(actionsApi.urlFor("run_action"))
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("run_action"));
       });
 
     });
@@ -50,13 +53,13 @@ describe("ActionsApi", () => {
 
       expect.hasAssertions();
       const trigger = "foo bar baz";
-      return actionsApi.run({ trigger: trigger }).then(data => {
-        const form = data.body.form;
+      return actionsApi.run({ trigger: trigger }).then(body => {
+        const form = body.form;
         const expectedForm = Object.assign({}, defaultExpectedForm, {
           trigger: trigger
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(actionsApi.urlFor("run_action"))
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("run_action"));
       });
 
     });
@@ -87,13 +90,13 @@ describe("ActionsApi", () => {
 
       expect.hasAssertions();
       const message = "yo";
-      return actionsApi.say({ message: message }).then(data => {
-        const form = data.body.form;
+      return actionsApi.say({ message: message }).then(body => {
+        const form = body.form;
         const expectedForm = Object.assign({}, defaultExpectedForm, {
           message: message
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(actionsApi.urlFor("say"))
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("say"));
       });
 
     });
@@ -125,15 +128,15 @@ describe("ActionsApi", () => {
         actionName: actionName,
         args: args
       });
-      return actionsApi.schedule(options).then(data => {
-        const form = data.body.form;
+      return actionsApi.schedule(options).then(body => {
+        const form = body.form;
         const expectedForm = Object.assign({}, defaultExpectedForm, defaultOptions, {
           actionName: options.actionName,
           "arguments[0].name": args[0].name,
           "arguments[0].value": args[0].value
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(actionsApi.urlFor("schedule_action"))
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("schedule_action"));
       });
 
     });
@@ -184,13 +187,13 @@ describe("ActionsApi", () => {
       const options = Object.assign({}, {
         actionName: actionName
       });
-      return actionsApi.unschedule(options).then(data => {
-        const form = data.body.form;
+      return actionsApi.unschedule(options).then(body => {
+        const form = body.form;
         const expectedForm = Object.assign({}, defaultExpectedForm, {
           actionName: options.actionName
         });
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(actionsApi.urlFor("unschedule_action"))
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("unschedule_action"));
       });
 
     });
@@ -228,8 +231,8 @@ describe("StorageApi", () => {
 
       expect.hasAssertions();
       const query = "{ foo { bar } }";
-      return storageApi.query({ query: query }).then(data => {
-        const form = data.body.form;
+      return storageApi.query({ query: query }).then(body => {
+        const form = body.form;
         const expectedForm = {
           query: query,
           operationName: undefined,
@@ -237,7 +240,7 @@ describe("StorageApi", () => {
           token: ellipsis.token
         };
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(storageApi.url())
+        expect(request.post.mock.calls[0][0].url).toEqual(storageApi.url());
       });
 
     });
@@ -247,8 +250,8 @@ describe("StorageApi", () => {
       expect.hasAssertions();
       const query = "{ foo { bar } }";
       const variables = { key1: "something", key2: { key3: "something else" } };
-      return storageApi.query({ query: query, variables: variables }).then(data => {
-        const form = data.body.form;
+      return storageApi.query({ query: query, variables: variables }).then(body => {
+        const form = body.form;
         const expectedForm = {
           query: query,
           operationName: undefined,
@@ -256,7 +259,7 @@ describe("StorageApi", () => {
           token: ellipsis.token
         };
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(storageApi.url())
+        expect(request.post.mock.calls[0][0].url).toEqual(storageApi.url());
       });
 
     });
@@ -266,8 +269,8 @@ describe("StorageApi", () => {
       expect.hasAssertions();
       const query = "{ foo { bar } }";
       const variables = '{ "key1": "something", "key2": { "key3": "something else" } }';
-      return storageApi.query({ query: query, variables: variables }).then(data => {
-        const form = data.body.form;
+      return storageApi.query({ query: query, variables: variables }).then(body => {
+        const form = body.form;
         const expectedForm = {
           query: query,
           operationName: undefined,
@@ -275,7 +278,7 @@ describe("StorageApi", () => {
           token: ellipsis.token
         };
         expect(form).toEqual(expectedForm);
-        expect(data.url).toEqual(storageApi.url())
+        expect(request.post.mock.calls[0][0].url).toEqual(storageApi.url());
       });
 
     });

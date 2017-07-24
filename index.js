@@ -53,7 +53,7 @@ class ActionsApi extends AbstractApi {
     } else if (response.statusCode !== 200) {
       this.handleError(options, response.statusCode + ": " + response.body);
     } else if (options.success) {
-      options.success(response, body);
+      options.success(body);
     } else {
       // do nothing if no success argument was provided
     }
@@ -218,8 +218,10 @@ class StorageApi extends AbstractApi {
       }, (error, response, body) => {
         if (error) {
           reject(error);
+        } else if (response.statusCode !== 200) {
+          reject(`Error ${response.statusCode}: ${response.body}`);
         } else {
-          resolve(response, body);
+          resolve(body);
         }
       });
     });
