@@ -1,10 +1,6 @@
 "use strict";
 
-jest.mock('request', () => {
-  return {
-    post: jest.fn((params, callback) => callback(null, { statusCode: 200 }, { form: params.form }))
-  };
-});
+jest.mock('request');
 
 const errorMessages = require('../error-messages');
 const request = require('request');
