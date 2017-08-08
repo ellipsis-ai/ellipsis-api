@@ -225,6 +225,10 @@ class Api extends AbstractApi {
     super(ellipsis);
     this.actions = new ActionsApi(ellipsis);
     this.storage = new StorageApi(ellipsis);
+    this.say = this.actions.say.bind(this.actions);
+    this.run = this.actions.run.bind(this.actions);
+    this.schedule = this.actions.schedule.bind(this.actions);
+    this.unschedule = this.actions.unschedule.bind(this.actions);
   }
 
 }

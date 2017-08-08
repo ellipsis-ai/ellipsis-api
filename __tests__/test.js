@@ -291,3 +291,37 @@ describe("StorageApi", () => {
   });
 
 });
+
+describe("legacy API methods", () => {
+  it("works to call say from the api root", () => {
+    expect.hasAssertions();
+
+    return api.say({ message: "yo" }).then(() => {
+      expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("say"));
+    });
+  });
+
+  it("works to call run from the api root", () => {
+    expect.hasAssertions();
+
+    return api.run({ trigger: "yo" }).then(() => {
+      expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("run_action"));
+    });
+  });
+
+  it("works to call schedule from the api root", () => {
+    expect.hasAssertions();
+
+    return api.schedule({ trigger: "yo", recurrence: "every day at noon" }).then(() => {
+      expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("schedule_action"));
+    });
+  });
+
+  it("works to call unschedule from the api root", () => {
+    expect.hasAssertions();
+
+    return api.unschedule({ trigger: "yo" }).then(() => {
+      expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("unschedule_action"));
+    });
+  });
+});
