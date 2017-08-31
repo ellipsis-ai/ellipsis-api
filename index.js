@@ -26,10 +26,8 @@ class AbstractApi {
   handleError(options, message) {
     if (options && options.error) {
       options.error(message);
-    } else if (this.ellipsis && this.ellipsis.error) {
-      this.ellipsis.error(message);
     } else {
-      throw message;
+      throw new Error(message);
     }
   }
 
@@ -41,7 +39,7 @@ class ActionsApi extends AbstractApi {
     if (error) {
       this.handleError(options, error);
     } else if (response.statusCode !== 200) {
-      this.handleError(options, response.statusCode + ": " + response.body);
+      this.handleError(options, response.statusCode + ": " + response.statusMessage);
     } else if (options.success) {
       options.success(body);
     } else {
