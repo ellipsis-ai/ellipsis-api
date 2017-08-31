@@ -24,10 +24,11 @@ class AbstractApi {
   }
 
   handleError(options, message) {
+    const error = message instanceof Error ? message : new Error(message);
     if (options && options.error) {
-      options.error(message);
+      options.error(error);
     } else {
-      throw new Error(message);
+      throw new Error(error);
     }
   }
 
@@ -175,7 +176,7 @@ class StorageApi extends AbstractApi {
   }
 
   checkOptionsIn(options) {
-    if (!options.query) {
+    if (!options || !options.query) {
       this.handleError(options, errorMessages.GRAPHQL_QUERY_MISSING);
     }
   }
@@ -192,7 +193,9 @@ class StorageApi extends AbstractApi {
 
   query(options) {
     return new Promise((resolve, reject) => {
-      this.checkOptionsIn(options);
+      this.checkOptionsIn(Object.assign({}, options, {
+        error: reject
+      }));
       const formData = {
         query: options.query,
         operationName: options.operationName,
@@ -207,7 +210,7 @@ class StorageApi extends AbstractApi {
         if (error) {
           reject(error);
         } else if (response.statusCode !== 200) {
-          reject(`Error ${response.statusCode}: ${response.body}`);
+          reject(`${response.statusCode}: ${response.statusMessage}`);
         } else {
           resolve(body);
         }

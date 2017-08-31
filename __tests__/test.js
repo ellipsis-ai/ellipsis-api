@@ -29,7 +29,7 @@ describe("ActionsApi", () => {
   describe("run", () => {
     it("sends an appropriate api request for a name", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const args = [ {name: "param", value: "v" }];
       const actionName = "foo";
       return actionsApi.run({ actionName: actionName, args: args }).then(body => {
@@ -47,7 +47,7 @@ describe("ActionsApi", () => {
 
     it("sends an appropriate api request for a trigger", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const trigger = "foo bar baz";
       return actionsApi.run({ trigger: trigger }).then(body => {
         const form = body.form;
@@ -62,19 +62,15 @@ describe("ActionsApi", () => {
 
     it("complains if no trigger or actionName", () => {
 
-      expect.hasAssertions();
-      actionsApi.run({}).catch(err => {
-        expect(err).toEqual(errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
-      });
+      expect.assertions(1);
+      expect(actionsApi.run({})).rejects.toHaveProperty('message', errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
 
     });
 
     it("complains if both trigger and actionName", () => {
 
       expect.hasAssertions();
-      actionsApi.run({ actionName: "foo", trigger: "bar" }).catch(err => {
-        expect(err).toEqual(errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
-      });
+      expect(actionsApi.run({ actionName: "foo", trigger: "bar" })).rejects.toHaveProperty('message', errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
 
     });
 
@@ -84,7 +80,7 @@ describe("ActionsApi", () => {
 
     it("sends an appropriate api request", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const message = "yo";
       return actionsApi.say({ message: message }).then(body => {
         const form = body.form;
@@ -99,10 +95,8 @@ describe("ActionsApi", () => {
 
     it("complains when no message", () => {
 
-      expect.hasAssertions();
-      return actionsApi.say({ }).catch(err => {
-        expect(err).toEqual(errorMessages.MESSAGE_MISSING);
-      });
+      expect.assertions(1);
+      expect(actionsApi.say({ })).rejects.toHaveProperty('message', errorMessages.MESSAGE_MISSING);
 
     });
 
@@ -117,7 +111,7 @@ describe("ActionsApi", () => {
 
     it("sends an appropriate api request", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const actionName = "some action";
       const args = [ {name: "param", value: "v" }];
       const options = Object.assign({}, defaultOptions, {
@@ -139,36 +133,30 @@ describe("ActionsApi", () => {
 
     it("complains when no trigger or action name", () => {
 
-      expect.hasAssertions();
-      return actionsApi.schedule(defaultOptions).catch(err => {
-        expect(err).toEqual(errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
-      });
+      expect.assertions(1);
+      expect(actionsApi.schedule(defaultOptions)).rejects.toHaveProperty('message', errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
 
     });
 
     it("complains when both trigger and action name", () => {
 
-      expect.hasAssertions();
+      expect.assertions(1);
       const options = Object.assign({}, defaultOptions, {
         actionName: "foo",
         trigger: "bar"
       });
-      return actionsApi.schedule(options).catch(err => {
-        expect(err).toEqual(errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
-      });
+      expect(actionsApi.schedule(options)).rejects.toHaveProperty('message', errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
 
     });
 
     it("complains when no recurrence", () => {
 
-      expect.hasAssertions();
+      expect.assertions(1);
       const options = Object.assign({}, defaultOptions, {
         actionName: "foo"
       });
       delete options.recurrence;
-      return actionsApi.schedule(options).catch(err => {
-        expect(err).toEqual(errorMessages.RECURRENCE_MISSING);
-      });
+      expect(actionsApi.schedule(options)).rejects.toHaveProperty('message', errorMessages.RECURRENCE_MISSING);
 
     });
 
@@ -178,7 +166,7 @@ describe("ActionsApi", () => {
 
     it("sends an appropriate api request", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const actionName = "some action";
       const options = Object.assign({}, {
         actionName: actionName
@@ -196,23 +184,19 @@ describe("ActionsApi", () => {
 
     it("complains when no trigger or action name", () => {
 
-      expect.hasAssertions();
-      return actionsApi.unschedule({}).catch(err => {
-        expect(err).toEqual(errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
-      });
+      expect.assertions(1);
+      expect(actionsApi.unschedule({})).rejects.toHaveProperty('message', errorMessages.TRIGGER_AND_ACTION_NAME_MISSING);
 
     });
 
     it("complains when both trigger and action name", () => {
 
-      expect.hasAssertions();
+      expect.assertions(1);
       const options = Object.assign({}, {
         actionName: "foo",
         trigger: "bar"
       });
-      return actionsApi.unschedule(options).catch(err => {
-        expect(err).toEqual(errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
-      });
+      expect(actionsApi.unschedule(options)).rejects.toHaveProperty('message', errorMessages.BOTH_TRIGGER_AND_ACTION_NAME);
 
     });
 
@@ -225,7 +209,7 @@ describe("StorageApi", () => {
   describe("query", () => {
     it("sends an appropriate api request for a query", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const query = "{ foo { bar } }";
       return storageApi.query({ query: query }).then(body => {
         const form = body.form;
@@ -243,7 +227,7 @@ describe("StorageApi", () => {
 
     it("handles variables passed in a JS object", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const query = "{ foo { bar } }";
       const variables = { key1: "something", key2: { key3: "something else" } };
       return storageApi.query({ query: query, variables: variables }).then(body => {
@@ -262,7 +246,7 @@ describe("StorageApi", () => {
 
     it("handles variables passed in a string", () => {
 
-      expect.hasAssertions();
+      expect.assertions(2);
       const query = "{ foo { bar } }";
       const variables = '{ "key1": "something", "key2": { "key3": "something else" } }';
       return storageApi.query({ query: query, variables: variables }).then(body => {
@@ -281,10 +265,8 @@ describe("StorageApi", () => {
 
     it("complains if no query", () => {
 
-      expect.hasAssertions();
-      storageApi.query({}).catch(err => {
-        expect(err).toEqual(errorMessages.GRAPHQL_QUERY_MISSING);
-      });
+      expect.assertions(1);
+      expect(storageApi.query()).rejects.toHaveProperty('message', errorMessages.GRAPHQL_QUERY_MISSING);
 
     });
 
