@@ -1,6 +1,6 @@
 const request = require('request');
 const errorMessages = require('./error-messages');
-const EllipsiApiError = require('./ellipsis-api-error');
+const EllipsisApiError = require('./ellipsis-api-error');
 
 class AbstractApi {
 
