@@ -1,5 +1,6 @@
 const request = require('request');
 const errorMessages = require('./error-messages');
+const EllipsisApiError = require('./ellipsis-api-error');
 
 class AbstractApi {
 
@@ -28,7 +29,7 @@ class AbstractApi {
     if (options && options.error) {
       options.error(error);
     } else {
-      throw new Error(error);
+      throw error;
     }
   }
 
@@ -40,7 +41,7 @@ class ActionsApi extends AbstractApi {
     if (error) {
       this.handleError(options, error);
     } else if (response.statusCode !== 200) {
-      this.handleError(options, response.statusCode + ": " + response.statusMessage);
+      this.handleError(options, new EllipsisApiError({ response: response, body: body }));
     } else if (options.success) {
       options.success(body);
     } else {
@@ -155,6 +156,7 @@ class ActionsApi extends AbstractApi {
       this.checkActionOptionsIn(mergedOptions);
       const formData = {
         actionName: mergedOptions.actionName,
+        trigger: mergedOptions.trigger,
         userId: mergedOptions.userId,
         channel: this.channelFor(mergedOptions),
         responseContext: this.responseContextFor(mergedOptions),
@@ -210,7 +212,7 @@ class StorageApi extends AbstractApi {
         if (error) {
           reject(error);
         } else if (response.statusCode !== 200) {
-          reject(`${response.statusCode}: ${response.statusMessage}`);
+          reject(new EllipsisApiError({ response: response, body: body }));
         } else {
           resolve(body);
         }

@@ -5,27 +5,29 @@ jest.mock('request');
 const errorMessages = require('../error-messages');
 const request = require('request');
 const EllipsisApi = require('../index');
-const ellipsis = {
-  userInfo: {
-    messageInfo: {
-      medium: "slack",
-      channel: "C123456"
-    }
-  },
-  token: "123456acbdef"
-};
-const defaultExpectedForm = {
-  responseContext: ellipsis.userInfo.messageInfo.medium,
-  channel: ellipsis.userInfo.messageInfo.channel,
-  token: ellipsis.token
-};
-
-const api = new EllipsisApi(ellipsis);
-const actionsApi = api.actions;
-const storageApi = api.storage;
+const EllipsisApiError = require('../ellipsis-api-error');
+let ellipsis, defaultExpectedForm, api, actionsApi, storageApi;
 
 describe("ActionsApi", () => {
-
+  beforeEach(() => {
+    ellipsis = {
+      userInfo: {
+        messageInfo: {
+          medium: "slack",
+          channel: "C123456"
+        }
+      },
+      token: "123456acbdef"
+    };
+    defaultExpectedForm = {
+      responseContext: ellipsis.userInfo.messageInfo.medium,
+      channel: ellipsis.userInfo.messageInfo.channel,
+      token: ellipsis.token
+    };
+    api = new EllipsisApi(ellipsis);
+    actionsApi = api.actions;
+    storageApi = api.storage;
+  });
   describe("run", () => {
     it("sends an appropriate api request for a name", () => {
 
@@ -74,6 +76,14 @@ describe("ActionsApi", () => {
 
     });
 
+    it("throws an EllipsisApiError if a bad status code is received", () => {
+      expect.assertions(1);
+      api.ellipsis.token = null;
+      const trigger = "foo bar baz";
+      return actionsApi.run({ trigger: trigger }).catch(err => {
+        expect(err instanceof EllipsisApiError).toBe(true);
+      });
+    });
   });
 
   describe("say", () => {
