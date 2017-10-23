@@ -212,6 +212,32 @@ describe("ActionsApi", () => {
 
   });
 
+  describe("generateToken", () => {
+
+    it("sends an appropriate api request", () => {
+
+      expect.assertions(2);
+      const expirySeconds = 300;
+      const isOneTime = true;
+      const options = Object.assign({}, {
+        expirySeconds: expirySeconds,
+        isOneTime: isOneTime
+      });
+      return actionsApi.generateToken(options).then(body => {
+        const form = body.form;
+        const expectedForm = Object.assign({}, { token: ellipsis.token }, {
+          expirySeconds: options.expirySeconds,
+          isOneTime: options.isOneTime
+        });
+        expect(form).toEqual(expectedForm);
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("v1/tokens"));
+      });
+
+    });
+
+  });
+
+
 });
 
 describe("StorageApi", () => {
