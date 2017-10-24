@@ -182,7 +182,8 @@ class ActionsApi extends AbstractApi {
       };
       request.post({
         url: this.urlFor("v1/tokens"),
-        form: formData
+        form: formData,
+        json: true
       }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
     });
   }
