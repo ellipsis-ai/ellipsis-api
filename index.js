@@ -169,6 +169,25 @@ class ActionsApi extends AbstractApi {
     });
   }
 
+  generateToken(options) {
+    return new Promise((resolve, reject) => {
+      const mergedOptions = Object.assign({}, options, {
+        success: resolve,
+        error: reject
+      });
+      const formData = {
+        expirySeconds: mergedOptions.expirySeconds,
+        isOneTime: mergedOptions.isOneTime,
+        token: this.token()
+      };
+      request.post({
+        url: this.urlFor("v1/tokens"),
+        form: formData,
+        json: true
+      }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
+    });
+  }
+
 }
 
 class StorageApi extends AbstractApi {
