@@ -251,6 +251,7 @@ class Api extends AbstractApi {
     this.run = this.actions.run.bind(this.actions);
     this.schedule = this.actions.schedule.bind(this.actions);
     this.unschedule = this.actions.unschedule.bind(this.actions);
+    this.generateToken = this.actions.generateToken.bind(this.actions);
   }
 
 }
