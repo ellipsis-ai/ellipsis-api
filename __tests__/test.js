@@ -6,7 +6,7 @@ const errorMessages = require('../error-messages');
 const request = require('request');
 const EllipsisApi = require('../index');
 const EllipsisApiError = require('../ellipsis-api-error');
-let ellipsis, defaultExpectedForm, api, actionsApi, storageApi;
+let ellipsis, defaultExpectedForm, expectedFormWithEventType, api, actionsApi, storageApi;
 
 describe("ActionsApi", () => {
   beforeEach(() => {
@@ -17,6 +17,9 @@ describe("ActionsApi", () => {
           channel: "C123456"
         }
       },
+      event: {
+        originalEventType: "chat"
+      },
       token: "123456acbdef"
     };
     defaultExpectedForm = {
@@ -24,6 +27,9 @@ describe("ActionsApi", () => {
       channel: ellipsis.userInfo.messageInfo.channel,
       token: ellipsis.token
     };
+    expectedFormWithEventType = Object.assign({}, defaultExpectedForm, {
+      originalEventType: ellipsis.event.originalEventType
+    });
     api = new EllipsisApi(ellipsis);
     actionsApi = api.actions;
     storageApi = api.storage;
@@ -36,7 +42,7 @@ describe("ActionsApi", () => {
       const actionName = "foo";
       return actionsApi.run({ actionName: actionName, args: args }).then(body => {
         const form = body.form;
-        const expectedForm = Object.assign({}, defaultExpectedForm, {
+        const expectedForm = Object.assign({}, expectedFormWithEventType, {
           actionName: actionName,
           "arguments[0].name": args[0].name,
           "arguments[0].value": args[0].value
@@ -53,7 +59,7 @@ describe("ActionsApi", () => {
       const trigger = "foo bar baz";
       return actionsApi.run({ trigger: trigger }).then(body => {
         const form = body.form;
-        const expectedForm = Object.assign({}, defaultExpectedForm, {
+        const expectedForm = Object.assign({}, expectedFormWithEventType, {
           trigger: trigger
         });
         expect(form).toEqual(expectedForm);
@@ -94,7 +100,7 @@ describe("ActionsApi", () => {
       const message = "yo";
       return actionsApi.say({ message: message }).then(body => {
         const form = body.form;
-        const expectedForm = Object.assign({}, defaultExpectedForm, {
+        const expectedForm = Object.assign({}, expectedFormWithEventType, {
           message: message
         });
         expect(form).toEqual(expectedForm);

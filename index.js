@@ -20,6 +20,10 @@ class AbstractApi {
     return options.responseContext ? options.responseContext : this.ellipsis.userInfo.messageInfo.medium;
   }
 
+  originalEventType() {
+    return this.ellipsis.event ? this.ellipsis.event.originalEventType : null;
+  }
+
   token() {
     return this.ellipsis.token;
   }
@@ -86,6 +90,7 @@ class ActionsApi extends AbstractApi {
         trigger: mergedOptions.trigger,
         responseContext: this.responseContextFor(mergedOptions),
         channel: this.channelFor(mergedOptions),
+        originalEventType: this.originalEventType(),
         token: this.token()
       }, this.argsFormDataFor(mergedOptions.args));
       request.post({
@@ -110,6 +115,7 @@ class ActionsApi extends AbstractApi {
             message: mergedOptions.message,
             responseContext: this.responseContextFor(mergedOptions),
             channel: this.channelFor(mergedOptions),
+            originalEventType: this.originalEventType(),
             token: this.token()
           }
         }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
