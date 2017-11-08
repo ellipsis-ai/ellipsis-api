@@ -148,7 +148,8 @@ class ActionsApi extends AbstractApi {
       }, this.argsFormDataFor(mergedOptions.args));
       request.post({
         url: this.urlFor("schedule_action"),
-        form: formData
+        form: formData,
+        json: true
       }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
     });
   }
@@ -170,7 +171,8 @@ class ActionsApi extends AbstractApi {
       };
       request.post({
         url: this.urlFor("unschedule_action"),
-        form: formData
+        form: formData,
+        json: true
       }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
     });
   }
