@@ -265,7 +265,7 @@ class UsersApi extends AbstractApi {
         token: this.token()
       };
       request.get({
-        url: this.urlFor("users/find"),
+        url: this.urlFor("users"),
         qs: qs,
         json: true
       }, (error, response, body) => {
