@@ -249,12 +249,45 @@ class StorageApi extends AbstractApi {
 
 }
 
+class UsersApi extends AbstractApi {
+  urlFor(path) {
+    return `${this.ellipsis.apiBaseUrl}/api/v1/${path}`;
+  }
+
+  findUserByEmail(email) {
+    return new Promise((resolve, reject) => {
+      const trimmedEmail = email.trim();
+      if (!trimmedEmail) {
+        this.handleError({ error: reject }, errorMessages.EMAIL_MISSING)
+      }
+      const qs = {
+        email: trimmedEmail,
+        token: this.token()
+      };
+      request.get({
+        url: this.urlFor("users/find"),
+        qs: qs,
+        json: true
+      }, (error, response, body) => {
+        if (error) {
+          reject(error);
+        } else if (response.statusCode !== 200) {
+          reject(new EllipsisApiError({ response: response, body: body }));
+        } else {
+          resolve(body);
+        }
+      });
+    });
+  }
+}
+
 class Api extends AbstractApi {
 
   constructor(ellipsis) {
     super(ellipsis);
     this.actions = new ActionsApi(ellipsis);
     this.storage = new StorageApi(ellipsis);
+    this.users = new UsersApi(ellipsis);
     this.say = this.actions.say.bind(this.actions);
     this.run = this.actions.run.bind(this.actions);
     this.schedule = this.actions.schedule.bind(this.actions);
