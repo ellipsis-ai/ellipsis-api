@@ -258,7 +258,7 @@ class UsersApi extends AbstractApi {
     return new Promise((resolve, reject) => {
       const trimmedEmail = email.trim();
       if (!trimmedEmail) {
-        this.handleError({ error: reject }, errorMessages.EMAIL_MISSING)
+        this.handleError({ error: reject }, errorMessages.EMAIL_MISSING);
       }
       const qs = {
         email: trimmedEmail,
