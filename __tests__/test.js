@@ -218,6 +218,59 @@ describe("ActionsApi", () => {
 
   });
 
+  describe("listen", () => {
+
+    const actionName = "some action";
+    const messageInputName = "message";
+    const args = [ {name: "param", value: "v" }];
+    const defaultOptions = {
+      actionName: actionName,
+      messageInputName: messageInputName
+    };
+
+    it("listens in default context", () => {
+
+      defaultExpectedForm = {
+        medium: api.ellipsis.userInfo.messageInfo.medium,
+        channel: api.ellipsis.userInfo.messageInfo.channel,
+        token: api.ellipsis.token,
+        userId: api.ellipsis.userInfo.ellipsisUserId
+      };
+
+      expect.assertions(2);
+      const options = Object.assign({}, { args: args }, defaultOptions);
+      return actionsApi.listen(options).then(body => {
+        const form = body.form;
+        const expectedForm = Object.assign({}, defaultExpectedForm, defaultOptions, {
+          actionName: options.actionName,
+          messageInputName: messageInputName,
+          "arguments[0].name": args[0].name,
+          "arguments[0].value": args[0].value
+        });
+        expect(form).toEqual(expectedForm);
+        expect(request.post.mock.calls[0][0].url).toEqual(actionsApi.urlFor("v1/add_message_listener"));
+      });
+
+    });
+
+    it("complains when no actionName", () => {
+
+      expect.assertions(1);
+      delete defaultOptions.actionName;
+      expect(actionsApi.listen(defaultOptions)).rejects.toHaveProperty('message', errorMessages.ACTION_NAME_MISSING);
+
+    });
+
+    it("complains when no messageInputName", () => {
+
+      expect.assertions(1);
+      delete defaultOptions.messageInputName;
+      expect(actionsApi.listen(defaultOptions)).rejects.toHaveProperty('message', errorMessages.MESSAGE_INPUT_NAME_MISSING);
+
+    });
+
+  });
+
   describe("generateToken", () => {
 
     it("sends an appropriate api request", () => {
