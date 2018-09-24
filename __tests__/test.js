@@ -296,6 +296,29 @@ describe("ActionsApi", () => {
 
   });
 
+  describe("deleteSavedAnswers", () => {
+    it("sends a delete user saved answer request by default with an inputName", () => {
+      return actionsApi.deleteSavedAnswers({
+        inputName: "inputThatSavesAnswers"
+      }).then(body => {
+        expect(request.delete.mock.calls[0][0].url).toEqual(actionsApi.urlFor(`v1/inputs/inputThatSavesAnswers/user_saved_answer/${ellipsis.token}`));
+      });
+    });
+
+    it('complains when inputName is missing', () => {
+      expect(actionsApi.deleteSavedAnswers({})).rejects.toHaveProperty('message', errorMessages.INPUT_NAME_MISSING);
+    });
+
+    it('sends a delete team saved answers request with an inputName and deleteAll', () => {
+      return actionsApi.deleteSavedAnswers({
+        inputName: "inputThatSavesAnswers",
+        deleteAll: true
+      }).then(body => {
+        expect(request.delete.mock.calls[0][0].url).toEqual(actionsApi.urlFor(`v1/inputs/inputThatSavesAnswers/team_saved_answers/${ellipsis.token}`));
+      });
+    });
+  });
+
 
 });
 

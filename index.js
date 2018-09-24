@@ -82,12 +82,16 @@ class ActionsApi extends AbstractApi {
     }
   }
 
+  mergeOptions(options, resolve, reject) {
+    return Object.assign({}, options, {
+      success: resolve,
+      error: reject
+    });
+  }
+
   run(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
       this.checkActionOptionsIn(mergedOptions);
       const formData = Object.assign({
         actionName: mergedOptions.actionName,
@@ -106,10 +110,7 @@ class ActionsApi extends AbstractApi {
 
   say(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
       if (!mergedOptions.message) {
         this.handleError(mergedOptions, errorMessages.MESSAGE_MISSING);
       } else {
@@ -136,10 +137,7 @@ class ActionsApi extends AbstractApi {
 
   schedule(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
       this.checkSchedulingOptionsIn(mergedOptions);
       const formData = Object.assign({
         actionName: mergedOptions.actionName,
@@ -160,10 +158,7 @@ class ActionsApi extends AbstractApi {
 
   unschedule(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
       this.checkActionOptionsIn(mergedOptions);
       const formData = {
         actionName: mergedOptions.actionName,
@@ -192,11 +187,8 @@ class ActionsApi extends AbstractApi {
 
   listen(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
-      this.checkListeningOptionsIn(options);
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
+      this.checkListeningOptionsIn(mergedOptions);
       const formData = Object.assign({
         actionName: mergedOptions.actionName,
         messageInputName: mergedOptions.messageInputName,
@@ -216,10 +208,7 @@ class ActionsApi extends AbstractApi {
 
   generateToken(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
       const formData = {
         expirySeconds: mergedOptions.expirySeconds,
         isOneTime: mergedOptions.isOneTime,
@@ -231,6 +220,33 @@ class ActionsApi extends AbstractApi {
         json: true
       }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
     });
+  }
+
+  checkDeleteSavedAnswerOptions(options) {
+    if (!options.inputName) {
+      this.handleError(options, errorMessages.INPUT_NAME_MISSING);
+    }
+  }
+
+  deleteSavedAnswers(options) {
+    return new Promise((resolve, reject) => {
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
+      this.checkDeleteSavedAnswerOptions(mergedOptions);
+      const endPoint = options.deleteAll ? "team_saved_answers" : "user_saved_answer";
+      request.delete({
+        url: this.urlFor(`v1/inputs/${mergedOptions.inputName}/${endPoint}/${this.token()}`)
+      }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
+    });
+  }
+
+  deleteUserSavedAnswer(options) {
+    return this.deleteSavedAnswers(options);
+  }
+
+  deleteTeamSavedAnswers(options) {
+    return this.deleteSavedAnswers(Object.assign({}, options, {
+      deleteAll: true
+    }));
   }
 
 }
