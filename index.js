@@ -20,6 +20,10 @@ class AbstractApi {
     return options.responseContext ? options.responseContext : this.ellipsis.userInfo.messageInfo.medium;
   }
 
+  mediumFor(options) {
+    return options.medium ? options.medium : this.ellipsis.userInfo.messageInfo.medium;
+  }
+
   originalEventType() {
     return this.ellipsis.event ? this.ellipsis.event.originalEventType : null;
   }
@@ -172,6 +176,39 @@ class ActionsApi extends AbstractApi {
     });
   }
 
+  checkListeningOptionsIn(options) {
+    if (!options.actionName) {
+      this.handleError(options, errorMessages.ACTION_NAME_MISSING);
+    }
+    if (!options.messageInputName) {
+      this.handleError(options, errorMessages.MESSAGE_INPUT_NAME_MISSING);
+    }
+  }
+
+  listen(options) {
+    return new Promise((resolve, reject) => {
+      const mergedOptions = Object.assign({}, options, {
+        success: resolve,
+        error: reject
+      });
+      this.checkListeningOptionsIn(options);
+      const formData = Object.assign({
+        actionName: mergedOptions.actionName,
+        messageInputName: mergedOptions.messageInputName,
+        medium: this.mediumFor(mergedOptions),
+        channel: this.channelFor(mergedOptions),
+        thread: mergedOptions.thread,
+        userId: this.ellipsis.userInfo.ellipsisUserId,
+        token: this.token()
+      }, this.argsFormDataFor(mergedOptions.args));
+      request.post({
+        url: this.urlFor("v1/add_message_listener"),
+        form: formData,
+        json: true
+      }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
+    });
+  }
+
   generateToken(options) {
     return new Promise((resolve, reject) => {
       const mergedOptions = this.mergeOptions(options, resolve, reject);
@@ -311,6 +348,7 @@ class Api extends AbstractApi {
     this.run = this.actions.run.bind(this.actions);
     this.schedule = this.actions.schedule.bind(this.actions);
     this.unschedule = this.actions.unschedule.bind(this.actions);
+    this.listen = this.actions.listen.bind(this.actions);
     this.generateToken = this.actions.generateToken.bind(this.actions);
   }
 
