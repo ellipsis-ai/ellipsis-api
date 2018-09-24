@@ -187,11 +187,8 @@ class ActionsApi extends AbstractApi {
 
   listen(options) {
     return new Promise((resolve, reject) => {
-      const mergedOptions = Object.assign({}, options, {
-        success: resolve,
-        error: reject
-      });
-      this.checkListeningOptionsIn(options);
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
+      this.checkListeningOptionsIn(mergedOptions);
       const formData = Object.assign({
         actionName: mergedOptions.actionName,
         messageInputName: mergedOptions.messageInputName,
