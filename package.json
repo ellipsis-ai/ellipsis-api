@@ -1,6 +1,10 @@
 {
   "name": "ellipsis-api",
   "version": "0.2.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ellipsis-ai/ellipsis-api"
+  },
   "description": "Interact with Ellipsis skills & actions",
   "main": "index.js",
   "scripts": {
@@ -15,6 +19,7 @@
   },
   "devDependencies": {
     "eslint": "^5.6.0",
+    "jest": "^23.6.0",
     "jest-cli": "^23.6.0"
   }
 }
