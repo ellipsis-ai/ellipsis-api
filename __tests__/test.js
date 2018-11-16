@@ -221,11 +221,9 @@ describe("ActionsApi", () => {
   describe("listen", () => {
 
     const actionName = "some action";
-    const messageInputName = "message";
     const args = [ {name: "param", value: "v" }];
     const defaultOptions = {
-      actionName: actionName,
-      messageInputName: messageInputName
+      actionName: actionName
     };
 
     it("listens in default context", () => {
@@ -243,7 +241,6 @@ describe("ActionsApi", () => {
         const form = body.form;
         const expectedForm = Object.assign({}, defaultExpectedForm, defaultOptions, {
           actionName: options.actionName,
-          messageInputName: messageInputName,
           "arguments[0].name": args[0].name,
           "arguments[0].value": args[0].value
         });
@@ -258,14 +255,6 @@ describe("ActionsApi", () => {
       expect.assertions(1);
       delete defaultOptions.actionName;
       expect(actionsApi.listen(defaultOptions)).rejects.toHaveProperty('message', errorMessages.ACTION_NAME_MISSING);
-
-    });
-
-    it("complains when no messageInputName", () => {
-
-      expect.assertions(1);
-      delete defaultOptions.messageInputName;
-      expect(actionsApi.listen(defaultOptions)).rejects.toHaveProperty('message', errorMessages.MESSAGE_INPUT_NAME_MISSING);
 
     });
 

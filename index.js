@@ -180,9 +180,6 @@ class ActionsApi extends AbstractApi {
     if (!options.actionName) {
       this.handleError(options, errorMessages.ACTION_NAME_MISSING);
     }
-    if (!options.messageInputName) {
-      this.handleError(options, errorMessages.MESSAGE_INPUT_NAME_MISSING);
-    }
   }
 
   listen(options) {
@@ -191,7 +188,6 @@ class ActionsApi extends AbstractApi {
       this.checkListeningOptionsIn(mergedOptions);
       const formData = Object.assign({
         actionName: mergedOptions.actionName,
-        messageInputName: mergedOptions.messageInputName,
         medium: this.mediumFor(mergedOptions),
         channel: this.channelFor(mergedOptions),
         thread: mergedOptions.thread,
