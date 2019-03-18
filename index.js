@@ -28,6 +28,19 @@ class AbstractApi {
     return this.ellipsis.event ? this.ellipsis.event.originalEventType : null;
   }
 
+  messageProperty(property) {
+    const msg = this.ellipsis.event.message;
+    return msg ? msg[property] : undefined;
+  }
+
+  originalMessageId() {
+    return this.messageProperty('id');
+  }
+
+  originalMessageThreadId() {
+    return this.messageProperty('thread');
+  }
+
   token() {
     return this.ellipsis.token;
   }
@@ -99,6 +112,8 @@ class ActionsApi extends AbstractApi {
         responseContext: this.responseContextFor(mergedOptions),
         channel: this.channelFor(mergedOptions),
         originalEventType: this.originalEventType(),
+        originalMessageId: this.originalMessageId(),
+        originalMessageThreadId: this.originalMessageThreadId(),
         token: this.token()
       }, this.argsFormDataFor(mergedOptions.args));
       request.post({
