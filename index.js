@@ -136,6 +136,8 @@ class ActionsApi extends AbstractApi {
             responseContext: this.responseContextFor(mergedOptions),
             channel: this.channelFor(mergedOptions),
             originalEventType: this.originalEventType(),
+            originalMessageId: this.originalMessageId(),
+            originalMessageThreadId: this.originalMessageThreadId(),
             token: this.token()
           }
         }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
