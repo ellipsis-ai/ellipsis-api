@@ -289,7 +289,7 @@ describe("ActionsApi", () => {
     it("sends a delete user saved answer request by default with an inputName", () => {
       return actionsApi.deleteSavedAnswers({
         inputName: "inputThatSavesAnswers"
-      }).then(body => {
+      }).then(() => {
         expect(request.delete.mock.calls[0][0].url).toEqual(actionsApi.urlFor(`v1/inputs/inputThatSavesAnswers/user_saved_answer/${ellipsis.token}`));
       });
     });
@@ -302,7 +302,7 @@ describe("ActionsApi", () => {
       return actionsApi.deleteSavedAnswers({
         inputName: "inputThatSavesAnswers",
         deleteAll: true
-      }).then(body => {
+      }).then(() => {
         expect(request.delete.mock.calls[0][0].url).toEqual(actionsApi.urlFor(`v1/inputs/inputThatSavesAnswers/team_saved_answers/${ellipsis.token}`));
       });
     });

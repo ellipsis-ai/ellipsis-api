@@ -1,6 +1,6 @@
 {
   "name": "ellipsis-api",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "repository": {
     "type": "git",
     "url": "https://github.com/ellipsis-ai/ellipsis-api"
@@ -15,10 +15,10 @@
   "author": "Ellipsis Co. <a@ellipsis.ai> (http://ellipsis.ai)",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.87.0"
+    "request": "^2.88.0"
   },
   "devDependencies": {
-    "eslint": "^5.6.0",
-    "jest": "^23.6.0"
+    "eslint": "^5.16.0",
+    "jest": "^24.8.0"
   }
 }
