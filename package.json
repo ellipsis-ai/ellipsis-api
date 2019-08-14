@@ -1,6 +1,6 @@
 {
   "name": "ellipsis-api",
-  "version": "0.2.8",
+  "version": "0.3.0-0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ellipsis-ai/ellipsis-api"
