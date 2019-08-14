@@ -209,6 +209,7 @@ class ActionsApi extends AbstractApi {
         channel: this.channelFor(mergedOptions),
         thread: mergedOptions.thread,
         userId: this.ellipsis.userInfo.ellipsisUserId,
+        copilot: mergedOptions.copilot,
         token: this.token()
       }, this.argsFormDataFor(mergedOptions.args));
       request.post({
