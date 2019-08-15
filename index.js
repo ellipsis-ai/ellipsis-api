@@ -209,10 +209,32 @@ class ActionsApi extends AbstractApi {
         channel: this.channelFor(mergedOptions),
         thread: mergedOptions.thread,
         userId: this.ellipsis.userInfo.ellipsisUserId,
+        copilot: mergedOptions.copilot,
         token: this.token()
       }, this.argsFormDataFor(mergedOptions.args));
       request.post({
         url: this.urlFor("v1/add_message_listener"),
+        form: formData,
+        json: true
+      }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
+    });
+  }
+
+  disableListen(options) {
+    return new Promise((resolve, reject) => {
+      const mergedOptions = this.mergeOptions(options, resolve, reject);
+      this.checkListeningOptionsIn(mergedOptions);
+      const formData = {
+        actionName: mergedOptions.actionName,
+        medium: this.mediumFor(mergedOptions),
+        channel: this.channelFor(mergedOptions),
+        thread: mergedOptions.thread,
+        userId: this.ellipsis.userInfo.ellipsisUserId,
+        copilot: mergedOptions.copilot,
+        token: this.token()
+      };
+      request.post({
+        url: this.urlFor("v1/disable_message_listener"),
         form: formData,
         json: true
       }, (error, response, body) => this.handleResponse(mergedOptions, error, response, body));
@@ -359,6 +381,7 @@ class Api extends AbstractApi {
     this.schedule = this.actions.schedule.bind(this.actions);
     this.unschedule = this.actions.unschedule.bind(this.actions);
     this.listen = this.actions.listen.bind(this.actions);
+    this.disableListen = this.actions.disableListen.bind(this.disableListen);
     this.generateToken = this.actions.generateToken.bind(this.actions);
   }
 
